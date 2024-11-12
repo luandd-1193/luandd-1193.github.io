@@ -23,6 +23,10 @@
     <!-- Nội dung chi tiết sản phẩm bên phải -->
     <div class="col-md-8">
       <div id="productDetails">
+        <!-- Ảnh sản phẩm -->
+        <div id="productImages" class="mb-3"></div>
+
+        <!-- Nội dung sản phẩm -->
         <div id="productContent"></div>
       </div>
     </div>
@@ -30,11 +34,10 @@
 </div>
 
 <!-- Toast thông báo -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
+<div class="toast-container position-fixed top-0 end-0 p-3">
   <div id="copyToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <strong class="me-auto">Thông báo</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
     <div class="toast-body">
       Đã sao chép nội dung vào clipboard!
@@ -46,38 +49,66 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  function loadProductContent(fileName) {
-    fetch(fileName)
+  function loadProductContent(contentFile) {
+    fetch(contentFile)
       .then(response => response.text())
       .then(text => {
-        const contentArray = text.split('\n\n'); // Chia nội dung thành từng đoạn
+        const lines = text.split('\n');
         const productContentDiv = document.getElementById('productContent');
+        const productImagesDiv = document.getElementById('productImages');
+        
         productContentDiv.innerHTML = ''; // Xóa nội dung cũ
+        productImagesDiv.innerHTML = ''; // Xóa ảnh cũ
+        let imageUrls = [];
+        let content = '';
 
-        contentArray.forEach((content, index) => {
-          // Tạo phần tử chứa nội dung và nút sao chép
+        // Xử lý từng dòng trong tệp
+        lines.forEach(line => {
+          // Kiểm tra nếu dòng là # ImageURL, chúng ta sẽ lấy danh sách ảnh
+          if (line.startsWith('# ImageURL')) {
+            const imageLines = lines.slice(lines.indexOf(line) + 1); // Lấy tất cả các dòng ảnh
+            imageUrls = imageLines.filter(imgLine => imgLine.trim() !== '');  // Lọc ảnh không rỗng
+          } else {
+            content += line + '\n';  // Chất chứa nội dung
+          }
+        });
+
+        // Hiển thị ảnh sản phẩm nếu có
+        if (imageUrls.length > 0) {
+          imageUrls.forEach(url => {
+            const imgElement = document.createElement('img');
+            imgElement.src = url;
+            imgElement.alt = 'Ảnh sản phẩm';
+            imgElement.classList.add('img-fluid', 'mb-3');
+            imgElement.style.maxHeight = '300px';
+            productImagesDiv.appendChild(imgElement);
+          });
+        }
+
+        // Hiển thị nội dung sản phẩm
+        const contentArray = content.split('\n\n'); // Chia nội dung thành từng đoạn
+        contentArray.forEach((item) => {
           const contentWrapper = document.createElement('div');
           contentWrapper.classList.add('content-wrapper', 'mb-3', 'p-2', 'border', 'rounded', 'position-relative');
-          
-          // Tạo phần tử chứa nội dung
+
           const contentText = document.createElement('pre');
-          contentText.textContent = content;
+          contentText.textContent = item;
           contentText.classList.add('content-text');
 
           // Tạo nút sao chép
           const copyIcon = document.createElement('i');
           copyIcon.classList.add('fas', 'fa-copy', 'copy-icon');
           copyIcon.title = 'Sao chép nội dung';
-          copyIcon.onclick = () => copyText(content);
-          
-          // Thêm phần tử vào contentWrapper
+          copyIcon.onclick = () => copyText(item);
+
           contentWrapper.appendChild(contentText);
           contentWrapper.appendChild(copyIcon);
           productContentDiv.appendChild(contentWrapper);
         });
 
+        // Đánh dấu sản phẩm được chọn
         document.querySelectorAll('#productList .list-group-item').forEach(item => item.classList.remove('active'));
-        document.querySelector(`[onclick="loadProductContent('${fileName}')"]`).classList.add('active');
+        document.querySelector(`[onclick="loadProductContent('${contentFile}')"]`).classList.add('active');
       })
       .catch(error => console.error('Error loading content:', error));
   }
@@ -105,6 +136,11 @@
     position: relative;
     padding-top: 20px;
     padding-right: 40px;
+  }
+
+  .toast-container {
+    top: 0;
+    right: 20px;
   }
 </style>
 
