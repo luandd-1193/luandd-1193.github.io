@@ -22,10 +22,8 @@
 
     <!-- Nội dung chi tiết sản phẩm bên phải -->
     <div class="col-md-8">
-      <div id="productDetails" class="position-relative">
-        <!-- Biểu tượng copy -->
-        <i class="fas fa-copy copy-icon" onclick="copyText()" title="Sao chép nội dung"></i>
-        <pre id="productContent"></pre>
+      <div id="productDetails">
+        <div id="productContent"></div>
       </div>
     </div>
   </div>
@@ -52,17 +50,41 @@
     fetch(fileName)
       .then(response => response.text())
       .then(text => {
-        document.getElementById('productContent').textContent = text;
+        const contentArray = text.split('\n\n'); // Chia nội dung thành từng đoạn
+        const productContentDiv = document.getElementById('productContent');
+        productContentDiv.innerHTML = ''; // Xóa nội dung cũ
+
+        contentArray.forEach((content, index) => {
+          // Tạo phần tử chứa nội dung và nút sao chép
+          const contentWrapper = document.createElement('div');
+          contentWrapper.classList.add('content-wrapper', 'mb-3', 'p-2', 'border', 'rounded', 'position-relative');
+          
+          // Tạo phần tử chứa nội dung
+          const contentText = document.createElement('pre');
+          contentText.textContent = content;
+          contentText.classList.add('content-text');
+
+          // Tạo nút sao chép
+          const copyIcon = document.createElement('i');
+          copyIcon.classList.add('fas', 'fa-copy', 'copy-icon');
+          copyIcon.title = 'Sao chép nội dung';
+          copyIcon.onclick = () => copyText(content);
+          
+          // Thêm phần tử vào contentWrapper
+          contentWrapper.appendChild(contentText);
+          contentWrapper.appendChild(copyIcon);
+          productContentDiv.appendChild(contentWrapper);
+        });
+
         document.querySelectorAll('#productList .list-group-item').forEach(item => item.classList.remove('active'));
         document.querySelector(`[onclick="loadProductContent('${fileName}')"]`).classList.add('active');
       })
       .catch(error => console.error('Error loading content:', error));
   }
 
-  function copyText() {
-    const textToCopy = document.getElementById('productContent').innerText;
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      var toast = new bootstrap.Toast(document.getElementById('copyToast'));
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = new bootstrap.Toast(document.getElementById('copyToast'));
       toast.show();
     }).catch(err => {
       console.error("Không thể sao chép", err);
@@ -71,17 +93,18 @@
 </script>
 
 <style>
-  #productContent {
-    position: relative;
-    padding-top: 20px;
-  }
-
   .copy-icon {
     position: absolute;
     top: 5px;
     right: 10px;
     cursor: pointer;
     color: #007bff;
+  }
+
+  .content-wrapper {
+    position: relative;
+    padding-top: 20px;
+    padding-right: 40px;
   }
 </style>
 
