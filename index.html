@@ -24,7 +24,7 @@
     <div class="col-md-8">
       <div id="productDetails">
         <!-- Ảnh sản phẩm -->
-        <div id="productImages" class="mb-3"></div>
+        <div id="productImages" class="row mb-3"></div>
 
         <!-- Nội dung sản phẩm -->
         <div id="productContent"></div>
@@ -61,15 +61,21 @@
         productImagesDiv.innerHTML = ''; // Xóa ảnh cũ
         let imageUrls = [];
         let content = '';
+        let isImageSection = false; // Biến kiểm tra phần ảnh
 
         // Xử lý từng dòng trong tệp
         lines.forEach(line => {
-          // Kiểm tra nếu dòng là # ImageURL, chúng ta sẽ lấy danh sách ảnh
+          // Nếu gặp # ImageURL thì chuyển sang phần ảnh
           if (line.startsWith('# ImageURL')) {
-            const imageLines = lines.slice(lines.indexOf(line) + 1); // Lấy tất cả các dòng ảnh
-            imageUrls = imageLines.filter(imgLine => imgLine.trim() !== '');  // Lọc ảnh không rỗng
+            isImageSection = true;
+          } else if (isImageSection) {
+            // Nếu đang trong phần ảnh, lấy URL ảnh
+            if (line.trim() !== '') {
+              imageUrls.push(line.trim());
+            }
           } else {
-            content += line + '\n';  // Chất chứa nội dung
+            // Chất chứa nội dung cho đến khi gặp # ImageURL
+            content += line + '\n';
           }
         });
 
@@ -79,13 +85,13 @@
             const imgElement = document.createElement('img');
             imgElement.src = url;
             imgElement.alt = 'Ảnh sản phẩm';
-            imgElement.classList.add('img-fluid', 'mb-3');
+            imgElement.classList.add('img-fluid col-md-4', 'mb-3');
             imgElement.style.maxHeight = '300px';
             productImagesDiv.appendChild(imgElement);
           });
         }
 
-        // Hiển thị nội dung sản phẩm
+        // Hiển thị nội dung sản phẩm (chỉ phần trước # ImageURL)
         const contentArray = content.split('\n\n'); // Chia nội dung thành từng đoạn
         contentArray.forEach((item) => {
           const contentWrapper = document.createElement('div');
