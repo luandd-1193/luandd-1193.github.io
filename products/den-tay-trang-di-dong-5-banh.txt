@@ -7,5 +7,5 @@ Bác sĩ quan tâm ib ạ
 # ImageURL
 images/den-tay-trang-di-dong-5-banh/1.jpg
 images/den-tay-trang-di-dong-5-banh/2.jpg
-images/den-tay-trang-di-dong-5-banh/3.jpg
+images/den-tay-trang-di-dong-5-banh/1.png
 images/den-tay-trang-di-dong-5-banh/2.png
