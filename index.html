@@ -17,17 +17,22 @@
         <li class="list-group-item active" onclick="loadProductContent('products/mui-cao-voi.txt')">Mũi cạo vôi</li>
         <li class="list-group-item" onclick="loadProductContent('products/may-rung-rua-noi-nha.txt')">Máy rung rửa nội nha</li>
         <li class="list-group-item" onclick="loadProductContent('products/may-cao-voi-vrn.txt')">Máy cạo vôi VRN</li>
+        <li class="list-group-item" onclick="loadProductContent('products/may-cao-voi-max-piezo-7-plus.txt')">Máy cạo vôi max piezo 7 plus</li>
+        <li class="list-group-item" onclick="loadProductContent('products/den-tay-trang-gan-ghe.txt')">Đèn tẩy trắng gắn ghế</li>
+        <li class="list-group-item" onclick="loadProductContent('products/den-tay-trang-di-dong-5-banh.txt')">Đèn tẩy trắng di động 5 bánh</li>
+        <li class="list-group-item" onclick="loadProductContent('products/den-tay-trang-di-dong-4-banh.txt')">Đèn tẩy trắng di động 4 bánh</li>
+        <li class="list-group-item" onclick="loadProductContent('products/den-tay-trang-di-dong-3-chuc-nang.txt')">Đèn tẩy trắng di động 3 chức năng</li>
       </ul>
     </div>
 
     <!-- Nội dung chi tiết sản phẩm bên phải -->
     <div class="col-md-8">
       <div id="productDetails">
-        <!-- Ảnh sản phẩm -->
-        <div id="productImages" class="row mb-3"></div>
-
         <!-- Nội dung sản phẩm -->
         <div id="productContent"></div>
+
+        <!-- Ảnh sản phẩm -->
+        <div id="productImages" class="row mb-3"></div>
       </div>
     </div>
   </div>
@@ -82,12 +87,29 @@
         // Hiển thị ảnh sản phẩm nếu có
         if (imageUrls.length > 0) {
           imageUrls.forEach(url => {
-            const imgElement = document.createElement('img');
-            imgElement.src = url;
-            imgElement.alt = 'Ảnh sản phẩm';
-            imgElement.classList.add('img-fluid', 'col-md-4', 'mb-3');
-            imgElement.style.maxHeight = '300px';
-            productImagesDiv.appendChild(imgElement);
+            const extension = url.split('.').pop().toLowerCase(); // Lấy phần mở rộng của file
+            let mediaElement;
+
+            if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+              // Tạo phần tử hình ảnh nếu là định dạng ảnh
+              mediaElement = document.createElement('img');
+              mediaElement.src = url;
+              mediaElement.alt = 'Ảnh sản phẩm';
+              mediaElement.classList.add('img-fluid', 'col-md-4', 'mb-3');
+              mediaElement.style.maxHeight = '300px';
+            } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
+              // Tạo phần tử video nếu là định dạng video
+              mediaElement = document.createElement('video');
+              mediaElement.src = url;
+              mediaElement.controls = true;
+              mediaElement.classList.add('img-fluid', 'col-md-4', 'mb-3');
+              mediaElement.style.maxHeight = '300px';
+            } else {
+              console.warn(`Không thể hiển thị file với định dạng: ${extension}`);
+              return; // Bỏ qua nếu không phải hình ảnh hoặc video
+            }
+
+            productImagesDiv.appendChild(mediaElement);
           });
         }
 
