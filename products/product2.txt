@@ -1,7 +1,0 @@
-Nội dung sản phẩm 2 - Chi tiết 1
-Dòng đầu tiên của sản phẩm 2.
-Dòng thứ hai của sản phẩm 2.
-
-Nội dung sản phẩm 2 - Chi tiết 2
-- Chi tiết một
-- Chi tiết hai
